@@ -18,7 +18,7 @@ class BoxMatrix2d {
 
         this.matrix = Array(this.rows).fill(null).map((_, iRow) => {
             return Array(this.cols).fill(null).map((_, iCol) => {
-                return new Box(this.boxSize, 'white'); 
+                return new Box(this.boxSize, 'black'); 
             });
         });
     }
@@ -94,7 +94,7 @@ function setup() {
 
     let rows = 17;
     let cols = 36;
-    let boxSize = 70;
+    let boxSize = 75;
     let boxDistance = 8; 
 
     boxMatrix = new BoxMatrix2d(rows, cols, boxSize, boxDistance);
