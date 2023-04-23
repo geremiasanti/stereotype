@@ -92,7 +92,7 @@ function setup() {
     );
     //noLoop();
 
-    let rows = 17;
+    let rows = 18;
     let cols = 36;
     let boxSize = 75;
     let boxDistance = 8; 
@@ -106,7 +106,7 @@ function draw() {
     orbitControl();
     lights();
 
-    translate(-100, 0, 200)
+    translate(-100, -50, 200)
     rotateX(- PI / 15);
     rotateY(PI / 4);
     boxMatrix.draw();

@@ -4,6 +4,7 @@ const KEYS_TO_IGNORE = [
     'Alt',
     'Control',
     'Shift',
+    'CapsLock',
 ];
 const CHAR_STATUSES = {
     'missing': 0,
@@ -64,13 +65,10 @@ let caret, stringDiv;
 $(function() {
     stringDiv = $('div#string');
     
-    setupString(
-        stringDiv, 
-        'Cheese and wine macaroni cheese cheese and biscuits. Emmental cheese strings cow cheeseburger cheese strings bocconcini macaroni cheese mascarpone.'
-    );
+    setupString(stringDiv, getNextString());
     
     $(document).on('keypress, keydown', function(event) {
-        handleKeypress(event.key);
+        handleKeypress(event.key, event);
     }); 
 });
 
@@ -88,13 +86,13 @@ function setupString(element, stringIn) {
     
     //put the string in the div
     element.css('color', 'gray');
-    element.append(stringOut);
+    element.html(stringOut);
 
     //set the caret at the beginning of the string
     caret = 0;
 }
 
-function handleKeypress(key) {
+function handleKeypress(key, event) {
     if (KEYS_TO_IGNORE.includes(key)) return;
 
     let nextChar = getCharByIndex(caret); 
@@ -104,9 +102,14 @@ function handleKeypress(key) {
     if (DEBUG) console.debug(`Typed key: ${key}\n`);
 
     switch (key) {
+        // reset
+        case 'Tab':
+            event.preventDefault();
+            setupString(stringDiv, getNextString());
+            break
+        // delete
         case 'Backspace':
             if (caret <= 0) break;
-
             prevChar.updateStatus(CHAR_STATUSES['missing']); 
             caret--;
             break
@@ -125,5 +128,9 @@ function getCharByIndex(i) {
     return new Char().fromHtmlElement(
         stringDiv.children('span').eq(i)
     );
+}
+
+function getNextString() {
+    return 'Cheese and wine macaroni cheese cheese and biscuits. Emmental cheese strings cow cheeseburger cheese strings bocconcini macaroni cheese mascarpone.'
 }
 
