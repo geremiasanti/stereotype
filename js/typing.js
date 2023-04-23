@@ -1,5 +1,6 @@
 // CONSTANTS 
 const DEBUG = true;
+const ANIMATE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-+/*&%$#@_(){}[]|?!~<>      ';
 const KEYS_TO_IGNORE = [
     'Alt',
     'Control',
@@ -14,21 +15,23 @@ const CHAR_STATUSES = {
 
 // CLASSES
 class Char{
-	constructor(char, status){
+	constructor(char, status, i){
     	this.char = char;
         this.status = status; 
+        this.i = i;
         this.htmlElement = null;
     }
 
     fromHtmlElement(element) {
         this.char = element.text();
         this.status = element.attr('status');
+        this.i = element.attr('i');
         this.htmlElement = element;
         return this;
     };
 
     toHtmlElement() {
-        return `<span status="${this.status}">${this.char}</span>`;
+        return `<span i="${this.i}" status="${this.status}">${this.char}</span>`;
     };
 
     updateStatus(newStatus) {
@@ -56,6 +59,28 @@ class Char{
         this.htmlElement.css('color', color);
         return this;
     }
+  
+    animateIn(steps) {
+        steps = (typeof(steps) == 'undefined') 
+            ? 10 + parseInt(this.i) % 20 
+            : steps;
+
+        if(steps == 0) {
+            this.htmlElement.html(this.char);
+            return; 
+        }
+
+        this.htmlElement.html(
+            ANIMATE_CHARS.charAt(
+                Math.floor(Math.random() * ANIMATE_CHARS.length)
+            )
+        );
+        
+        let this_ = this;
+        setTimeout(function() { 
+            this_.animateIn(steps - 1)
+        }, 80);
+    }
 }
 
 // GLOABAL VARIABLES
@@ -68,7 +93,7 @@ $(function() {
     setupString(stringDiv, getNextString());
     
     $(document).on('keypress, keydown', function(event) {
-        handleKeypress(event.key, event);
+        handleKeypress(event);
     }); 
 });
 
@@ -80,7 +105,8 @@ function setupString(element, stringIn) {
     for (var i = 0; i < stringIn.length; i++) {
         stringOut += new Char(
             stringIn.charAt(i), 
-            CHAR_STATUSES['missing']
+            CHAR_STATUSES['missing'],
+            i
         ).toHtmlElement();
     }
     
@@ -88,11 +114,19 @@ function setupString(element, stringIn) {
     element.css('color', 'gray');
     element.html(stringOut);
 
+    //trigger animation on all Chars
+    let chars = getChars();
+    chars.forEach(function(char) {
+        char.animateIn();
+    })
+
     //set the caret at the beginning of the string
     caret = 0;
 }
 
-function handleKeypress(key, event) {
+function handleKeypress(event) {
+    let key = event.key;
+
     if (KEYS_TO_IGNORE.includes(key)) return;
 
     let nextChar = getCharByIndex(caret); 
@@ -122,6 +156,17 @@ function handleKeypress(key, event) {
             caret++;
             break;
     }
+}
+
+function getChars() {
+    let charsOut = [];
+    let htmlElements = stringDiv.children('span');
+    htmlElements.each(function() {
+        charsOut.push(
+            new Char().fromHtmlElement($(this))
+        )
+    })
+    return charsOut;
 }
 
 function getCharByIndex(i) {
