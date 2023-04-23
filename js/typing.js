@@ -1,6 +1,6 @@
 // CONSTANTS 
 const DEBUG = true;
-const ANIMATE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-+/*&%$#@_(){}[]|?!~<>      ';
+const ANIMATE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-+/*&%$#@_(){}[]|?!~<>     ';
 const KEYS_TO_IGNORE = [
     'Alt',
     'Control',
@@ -62,7 +62,7 @@ class Char{
   
     animateIn(steps) {
         steps = (typeof(steps) == 'undefined') 
-            ? 10 + parseInt(this.i) % 20 
+            ? 5 + (parseInt(this.i) % 15)
             : steps;
 
         if(steps == 0) {
@@ -79,7 +79,9 @@ class Char{
         let this_ = this;
         setTimeout(function() { 
             this_.animateIn(steps - 1)
-        }, 80);
+        }, Math.floor(
+            Math.random() * 80 + 30
+        ));
     }
 }
 
