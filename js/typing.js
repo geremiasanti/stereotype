@@ -31,7 +31,7 @@ class Char{
     };
 
     toHtmlElement() {
-        return `<span i="${this.i}" status="${this.status}">${this.char}</span>`;
+        return `<span i="${this.i}" status="${this.status}" what="char">${this.char}</span>`;
     };
 
     updateStatus(newStatus) {
@@ -47,7 +47,7 @@ class Char{
                 color = 'gray';
                 break;
             case CHAR_STATUSES['correct']:
-                color = 'green';
+                color = 'white';
                 break;
             case CHAR_STATUSES['wrong']:
                 color = 'red'
@@ -93,9 +93,11 @@ $(function() {
     stringDiv = $('div#string');
     
     setupString(stringDiv, getNextString());
+    drawCaret();
     
     $(document).on('keypress, keydown', function(event) {
         handleKeypress(event);
+        drawCaret();
     }); 
 });
 
@@ -103,7 +105,7 @@ $(function() {
 function setupString(element, stringIn) {
     let stringOut = '';
 
-    //every char is surrounded by a span
+    // every char is surrounded by a span
     for (var i = 0; i < stringIn.length; i++) {
         stringOut += new Char(
             stringIn.charAt(i), 
@@ -112,17 +114,17 @@ function setupString(element, stringIn) {
         ).toHtmlElement();
     }
     
-    //put the string in the div
+    // put the string in the div
     element.css('color', 'gray');
     element.html(stringOut);
 
-    //trigger animation on all Chars
+    // trigger animation on all Chars
     let chars = getChars();
     chars.forEach(function(char) {
         char.animateIn();
     })
 
-    //set the caret at the beginning of the string
+    // set the caret at the beginning of the string
     caret = 0;
 }
 
@@ -162,7 +164,7 @@ function handleKeypress(event) {
 
 function getChars() {
     let charsOut = [];
-    let htmlElements = stringDiv.children('span');
+    let htmlElements = stringDiv.children('span[what="char"]');
     htmlElements.each(function() {
         charsOut.push(
             new Char().fromHtmlElement($(this))
@@ -173,8 +175,15 @@ function getChars() {
 
 function getCharByIndex(i) {
     return new Char().fromHtmlElement(
-        stringDiv.children('span').eq(i)
+        stringDiv.children('span[what="char"]').eq(i)
     );
+}
+
+function drawCaret() {
+    //if ()
+    $('<span class="blinking-cursor">|</span>').insertBefore(
+        getCharByIndex(caret).htmlElement
+    )
 }
 
 function getNextString() {
