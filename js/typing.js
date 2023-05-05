@@ -23,7 +23,7 @@ class Char{
     }
 
     fromHtmlElement(element) {
-        this.char = element.text();
+        this.char = element.text().charAt(0);
         this.status = element.attr('status');
         this.i = element.attr('i');
         this.htmlElement = element;
@@ -31,8 +31,7 @@ class Char{
     };
 
     toHtmlElement() {
-        return `<span i="${this.i}" status="${this.status}" what="char">${this.char}</span>`;
-    };
+        return `<span i="${this.i}" status="${this.status}" what="char">${this.char}</span>`};
 
     updateStatus(newStatus) {
         if (this.htmlElement == null) throw new Error(
@@ -66,7 +65,7 @@ class Char{
             : steps;
 
         if(steps == 0) {
-            this.htmlElement.html(this.char);
+            this.htmlElement.text(this.char);
             return; 
         }
 
@@ -93,7 +92,7 @@ $(function() {
     stringDiv = $('div#string');
     
     setupString(stringDiv, getNextString());
-    drawCaret();
+    drawCaret(true);
     
     $(document).on('keypress, keydown', function(event) {
         handleKeypress(event);
@@ -121,7 +120,7 @@ function setupString(element, stringIn) {
     // trigger animation on all Chars
     let chars = getChars();
     chars.forEach(function(char) {
-        char.animateIn();
+        //char.animateIn();
     })
 
     // set the caret at the beginning of the string
@@ -169,7 +168,7 @@ function getChars() {
         charsOut.push(
             new Char().fromHtmlElement($(this))
         )
-    })
+    });
     return charsOut;
 }
 
@@ -179,11 +178,17 @@ function getCharByIndex(i) {
     );
 }
 
-function drawCaret() {
-    //if ()
-    $('<span class="blinking-cursor">|</span>').insertBefore(
-        getCharByIndex(caret).htmlElement
-    )
+function drawCaret(setup = false) {
+    if(setup) {
+        $(getCharByIndex(caret).htmlElement).append(
+            '<span class="caret blinking">|</span>'
+        )
+    } else {
+        $('span.caret').remove();
+        $(getCharByIndex(caret).htmlElement).append(
+            '<span class="caret">|</span>'
+        )
+    }
 }
 
 function getNextString() {
